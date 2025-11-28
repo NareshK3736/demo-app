@@ -10,6 +10,7 @@ import 'profile_screen.dart';
 import 'products_screen.dart';
 import 'settings_screen.dart';
 import 'edit_profile_screen.dart';
+import 'image_gallery_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -334,6 +335,35 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                   child: const Text('Simple Navigation (No Data)'),
+                ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+                const Text(
+                  'Image Gallery:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ImageGalleryScreen(
+                          title: 'Image Gallery',
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.photo_library),
+                  label: const Text('Open Image Gallery'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Colors.indigo,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 const Divider(),
