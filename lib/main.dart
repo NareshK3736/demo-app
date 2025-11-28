@@ -3,11 +3,8 @@ import 'package:provider/provider.dart';
 import 'services/deep_link_service.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
-import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
-import 'screens/profile_screen.dart';
-import 'screens/products_screen.dart';
-import 'screens/settings_screen.dart';
+import 'screens/main_navigation_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,20 +90,16 @@ class _MyAppState extends State<MyApp> {
           useMaterial3: true,
         ),
         routes: {
-          '/': (context) => const HomeScreen(),
+          '/': (context) => const MainNavigationScreen(),
           '/login': (context) => const LoginScreen(),
-          '/profile': (context) {
-            final userId = ModalRoute.of(context)?.settings.arguments as String?;
-            return ProfileScreen(userId: userId);
-          },
-          '/products': (context) {
-            final args = ModalRoute.of(context)?.settings.arguments as Map<String, String?>?;
-            return ProductsScreen(
-              categoryId: args?['categoryId'],
-              productId: args?['productId'],
-            );
-          },
-          '/settings': (context) => const SettingsScreen(),
+          '/home': (context) => const MainNavigationScreen(initialIndex: 0),
+          '/products': (context) => const MainNavigationScreen(
+                initialIndex: 1,
+              ),
+          '/profile': (context) => const MainNavigationScreen(
+                initialIndex: 2,
+              ),
+          '/settings': (context) => const MainNavigationScreen(initialIndex: 3),
         },
         initialRoute: '/',
       ),

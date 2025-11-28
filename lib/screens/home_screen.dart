@@ -3,10 +3,22 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/user_provider.dart';
 import '../widgets/cacheable_image.dart';
+import '../utils/dialog_utility.dart';
+import '../models/navigation_models.dart';
+import '../services/navigation_service.dart';
+import 'profile_screen.dart';
+import 'products_screen.dart';
+import 'settings_screen.dart';
+import 'edit_profile_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,25 +174,263 @@ class HomeScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/profile');
+                const Divider(),
+                const SizedBox(height: 16),
+                const Text(
+                  'Navigation Examples:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    // Navigate with data model and get result back
+                    final userData = UserNavigationData(
+                      userId: 'user_123',
+                      userName: 'John Doe',
+                      userEmail: 'john@example.com',
+                    );
+
+                    final result = await NavigationService.navigateForResult<UserNavigationData>(
+                      context: context,
+                      screen: const ProfileScreen(),
+                      data: userData,
+                    );
+
+                    if (result != null && mounted) {
+                      if (result.success && result.data != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              result.message ?? 'Profile updated: ${result.data!.userName}',
+                            ),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    }
                   },
-                  child: const Text('Go to Profile'),
+                  icon: const Icon(Icons.person),
+                  label: const Text('Profile (with Data & Result)'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    // Navigate to edit profile and get updated data back
+                    final userData = UserNavigationData(
+                      userId: 'user_123',
+                      userName: 'John Doe',
+                      userEmail: 'john@example.com',
+                    );
+
+                    final result = await NavigationService.navigateForResult<UserNavigationData>(
+                      context: context,
+                      screen: const EditProfileScreen(),
+                      data: userData,
+                    );
+
+                    if (result != null && mounted) {
+                      if (result.success && result.data != null) {
+                        DialogUtility.showSuccessDialog(
+                          context: context,
+                          message: 'Profile updated: ${result.data!.userName}',
+                        );
+                      } else if (!result.success && result.message != 'Cancelled') {
+                        DialogUtility.showErrorDialog(
+                          context: context,
+                          message: result.message ?? 'Failed to update profile',
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Edit Profile (Get Result)'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    // Navigate with product data
+                    final productData = ProductNavigationData(
+                      productId: 'prod_001',
+                      productName: 'Sample Product',
+                      categoryId: 'cat_001',
+                      price: 99.99,
+                    );
+
+                    final result = await NavigationService.navigateForResult<ProductNavigationData>(
+                      context: context,
+                      screen: const ProductsScreen(),
+                      data: productData,
+                    );
+
+                    if (result != null && mounted) {
+                      if (result.success && result.data != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Selected: ${result.data!.productName} - \$${result.data!.price}',
+                            ),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.shopping_bag),
+                  label: const Text('Products (with Data)'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    // Navigate with settings data and get result
+                    final settingsData = SettingsNavigationData(
+                      theme: 'Dark',
+                      language: 'English',
+                    );
+
+                    final result = await NavigationService.navigateForResult<SettingsNavigationData>(
+                      context: context,
+                      screen: const SettingsScreen(),
+                      data: settingsData,
+                    );
+
+                    if (result != null && mounted) {
+                      if (result.success && result.data != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Settings saved: ${result.data!.theme} theme, ${result.data!.language} language',
+                            ),
+                            backgroundColor: Colors.purple,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.settings),
+                  label: const Text('Settings (with Data & Result)'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/products');
+                    // Simple navigation without data
+                    NavigationService.navigateWithDataNoResult(
+                      context: context,
+                      screen: const ProfileScreen(),
+                    );
                   },
-                  child: const Text('Go to Products'),
+                  child: const Text('Simple Navigation (No Data)'),
+                ),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+                const Text(
+                  'Dialog Examples:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/settings');
-                  },
-                  child: const Text('Go to Settings'),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        DialogUtility.showSuccessDialog(
+                          context: context,
+                          message: 'Operation completed successfully!',
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                      ),
+                      child: const Text('Success Dialog'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        DialogUtility.showErrorDialog(
+                          context: context,
+                          message: 'Something went wrong!',
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      child: const Text('Error Dialog'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final confirmed = await DialogUtility.showConfirmationDialog(
+                          context: context,
+                          title: 'Delete Item',
+                          message: 'Are you sure you want to delete this item?',
+                          confirmText: 'Delete',
+                          cancelText: 'Cancel',
+                          isDestructive: true,
+                        );
+                        if (confirmed && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Item deleted')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                      ),
+                      child: const Text('Confirm Dialog'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        DialogUtility.showSingleButtonDialog(
+                          context: context,
+                          title: 'Custom Dialog',
+                          message: 'This is a custom dialog with rounded corners!',
+                          image: const Icon(
+                            Icons.info,
+                            color: Colors.blue,
+                            size: 64,
+                          ),
+                          borderRadius: 20.0,
+                        );
+                      },
+                      child: const Text('Custom Dialog'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        DialogUtility.showLoadingDialog(
+                          context: context,
+                          message: 'Loading data...',
+                        );
+                        // Simulate async operation
+                        Future.delayed(const Duration(seconds: 2), () {
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                            DialogUtility.showSuccessDialog(
+                              context: context,
+                              message: 'Data loaded successfully!',
+                            );
+                          }
+                        });
+                      },
+                      child: const Text('Loading Dialog'),
+                    ),
+                  ],
                 ),
               ],
             ),
