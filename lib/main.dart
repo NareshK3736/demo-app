@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'services/deep_link_service.dart';
+import 'providers/auth_provider.dart';
+import 'providers/user_provider.dart';
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/products_screen.dart';
 import 'screens/settings_screen.dart';
@@ -76,29 +80,36 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Deep Link Demo App',
-      navigatorKey: navigatorKey,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Deep Link Demo App',
+        navigatorKey: navigatorKey,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        routes: {
+          '/': (context) => const HomeScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/profile': (context) {
+            final userId = ModalRoute.of(context)?.settings.arguments as String?;
+            return ProfileScreen(userId: userId);
+          },
+          '/products': (context) {
+            final args = ModalRoute.of(context)?.settings.arguments as Map<String, String?>?;
+            return ProductsScreen(
+              categoryId: args?['categoryId'],
+              productId: args?['productId'],
+            );
+          },
+          '/settings': (context) => const SettingsScreen(),
+        },
+        initialRoute: '/',
       ),
-      routes: {
-        '/': (context) => const HomeScreen(),
-        '/profile': (context) {
-          final userId = ModalRoute.of(context)?.settings.arguments as String?;
-          return ProfileScreen(userId: userId);
-        },
-        '/products': (context) {
-          final args = ModalRoute.of(context)?.settings.arguments as Map<String, String?>?;
-          return ProductsScreen(
-            categoryId: args?['categoryId'],
-            productId: args?['productId'],
-          );
-        },
-        '/settings': (context) => const SettingsScreen(),
-      },
-      initialRoute: '/',
     );
   }
 
